@@ -58,4 +58,18 @@ export class UserService {
     this.users[userIndex].updatedAt = Date.now();
     this.users[userIndex].version++;
   }
+
+  delete(id: string) {
+    if (!validate(id)) {
+      throw new BadRequestException('Id not UUID type');
+    }
+
+    const userIndex = this.users.findIndex((user) => user.id === id);
+
+    if (userIndex === -1) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    this.users.splice(userIndex, 1); // Remove the user from the array
+  }
 }
