@@ -23,12 +23,12 @@ export class UserController {
   }
 
   @Get()
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<Omit<User, 'password'>[]> {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<User> {
+  async findOne(@Param('id') id: string): Promise<Omit<User, 'password'>> {
     return this.userService.findById(id);
   }
 

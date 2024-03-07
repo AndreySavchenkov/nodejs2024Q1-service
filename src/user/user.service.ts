@@ -23,11 +23,11 @@ export class UserService {
     });
   }
 
-  findAll(): User[] {
-    return this.users;
+  findAll(): Omit<User, 'password'>[] {
+    return this.users.map(({ password, ...rest }) => rest);
   }
 
-  findById(id: string): User {
+  findById(id: string): Omit<User, 'password'> {
     if (!validate(id)) {
       throw new BadRequestException('Id not UUID type');
     }
@@ -37,7 +37,11 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-    return user;
+    const { password, ...rest } = user;
+
+    const userWithoutPassword: Omit<User, 'password'> = { ...rest };
+
+    return userWithoutPassword;
   }
 
   updatePassword(id: string, dto: UpdatePasswordDto) {
