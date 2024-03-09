@@ -6,7 +6,6 @@ import {
   Param,
   Delete,
   Put,
-  HttpStatus,
   HttpCode,
 } from '@nestjs/common';
 import { ArtistService } from './artist.service';
