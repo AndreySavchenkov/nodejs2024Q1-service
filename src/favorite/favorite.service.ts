@@ -1,73 +1,35 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { Favorites } from './entities/favorite.entity';
-import { validate } from 'uuid';
+import { Injectable } from '@nestjs/common';
+import { dbService } from 'src/db/db.service';
 
 @Injectable()
 export class FavoriteService {
-  private readonly favorites: Favorites = {
-    artists: [],
-    tracks: [],
-    albums: [],
-  };
+  constructor(private readonly dbService: dbService) {}
 
   getAll() {
-    return this.favorites;
+    return this.dbService.findAllFavorites();
   }
 
   addArtist(id: string) {
-    this.favorites.artists.push(id);
+    this.dbService.addArtistInFavorite(id);
   }
 
   addAlbum(id: string) {
-    this.favorites.albums.push(id);
+    this.dbService.addAlbumInFavorites(id);
   }
 
   addTrack(id: string) {
-    this.favorites.tracks.push(id);
+    this.dbService.addTrackInFavorites(id);
   }
 
   deleteArtist(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
-    const artistIndex = this.favorites.artists.findIndex(
-      (artist) => artist === id,
-    );
-
-    if (artistIndex === -1) {
-      throw new NotFoundException(`Artist with id ${id} not found`);
-    }
-
-    this.favorites.artists.splice(artistIndex, 1);
+    this.dbService.deleteArtistFromFavorites(id);
   }
 
   deleteAlbum(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
-    const albumIndex = this.favorites.albums.findIndex((album) => album === id);
-
-    if (albumIndex === -1) {
-      throw new NotFoundException(`Album with id ${id} not found`);
-    }
-
-    this.favorites.albums.splice(albumIndex, 1);
+    this.dbService.deleteAlbumFromFavorites(id);
   }
 
   deleteTrack(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
-    const trackIndex = this.favorites.tracks.findIndex((track) => track === id);
-
-    if (trackIndex === -1) {
-      throw new NotFoundException(`Track with id ${id} not found`);
-    }
-
-    this.favorites.tracks.splice(trackIndex, 1);
+    this.dbService.deleteTrackFromFavorites(id);
   }
 }

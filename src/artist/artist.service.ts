@@ -1,73 +1,29 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { Artist } from './entities/artist.entity';
-import { v4 as uuid, validate } from 'uuid';
+import { dbService } from 'src/db/db.service';
 
 @Injectable()
 export class ArtistService {
-  private readonly artists: Artist[] = [];
+  constructor(private readonly dbService: dbService) {}
 
   create(createArtistDto: CreateArtistDto) {
-    const { name, grammy } = createArtistDto;
-    this.artists.push({
-      id: uuid(),
-      name,
-      grammy,
-    });
+    this.dbService.createArtist(createArtistDto);
   }
 
   findAll() {
-    return this.artists;
+    return this.dbService.findAllArtist();
   }
 
   findOne(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
-
-    const artist = this.artists.find((track) => track.id === id);
-
-    if (!artist) {
-      throw new NotFoundException(`Artist with id ${id} not found`);
-    }
-
-    return artist;
+    return this.dbService.findArtistById(id);
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
-
-    const artistIndex = this.artists.findIndex((artist) => artist.id === id);
-
-    if (artistIndex === -1) {
-      throw new NotFoundException(`Artist with id ${id} not found`);
-    }
-
-    this.artists[artistIndex] = {
-      id: this.artists[artistIndex].id,
-      name: updateArtistDto.name,
-      grammy: updateArtistDto.grammy,
-    };
+    this.dbService.updateArtist(id, updateArtistDto);
   }
 
   remove(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
-
-    const artistIndex = this.artists.findIndex((artist) => artist.id === id);
-
-    if (artistIndex === -1) {
-      throw new NotFoundException(`Artist with id ${id} not found`);
-    }
-
-    this.artists.splice(artistIndex, 1);
+    this.dbService.removeArtist(id);
   }
 }
