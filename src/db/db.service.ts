@@ -144,12 +144,36 @@ export class dbService {
     }
 
     const artistIndex = this.artists.findIndex((artist) => artist.id === id);
+    console.log('artistIndex ->', artistIndex);
 
     if (artistIndex === -1) {
       throw new NotFoundException(`Artist with id ${id} not found`);
     }
 
     this.artists.splice(artistIndex, 1);
+
+    //delete from favorites
+    const artistIndexInFavorites = this.favorites.artists.findIndex(
+      (artist) => artist === id,
+    );
+
+    if (artistIndexInFavorites !== -1) {
+      this.favorites.artists.splice(artistIndexInFavorites, 1);
+    }
+
+    //artistId: null in tracks
+    for (let i = this.tracks.length - 1; i >= 0; i--) {
+      if (this.tracks[i].artistId === id) {
+        this.tracks[i].artistId = null;
+      }
+    }
+
+    //artistId: null in albums
+    for (let i = this.albums.length - 1; i >= 0; i--) {
+      if (this.albums[i].artistId === id) {
+        this.albums[i].artistId = null;
+      }
+    }
   }
 
   createTrack(createTrackDto: CreateTrackDto) {
@@ -213,6 +237,15 @@ export class dbService {
     }
 
     this.tracks.splice(trackIndex, 1);
+
+    //delete from favorites
+    const trackIndexInFavorites = this.favorites.tracks.findIndex(
+      (track) => track === id,
+    );
+
+    if (trackIndexInFavorites !== -1) {
+      this.favorites.tracks.splice(trackIndexInFavorites, 1);
+    }
   }
 
   createAlbum(createAlbumDto: CreateAlbumDto) {
@@ -274,11 +307,25 @@ export class dbService {
     }
 
     this.albums.splice(albumId, 1);
+
+    //delete from favorites
+    const albumIndexInFavorites = this.favorites.albums.findIndex(
+      (album) => album === id,
+    );
+
+    if (albumIndexInFavorites !== -1) {
+      this.favorites.albums.splice(albumIndexInFavorites, 1);
+    }
+
+    //albumId: null in tracks
+    for (let i = this.tracks.length - 1; i >= 0; i--) {
+      if (this.tracks[i].albumId === id) {
+        this.tracks[i].albumId = null;
+      }
+    }
   }
 
   findAllFavorites() {
-    // return this.favorites;
-    // const favorites = this.favoriteService.getAll();
     const { artists, tracks, albums } = this.favorites;
 
     const allArtists = this.findAllArtist();
