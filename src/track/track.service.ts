@@ -8,7 +8,7 @@ export class TrackService {
   constructor(private readonly dbService: dbService) {}
 
   create(createTrackDto: CreateTrackDto) {
-    this.dbService.createTrack(createTrackDto);
+    return this.dbService.createTrack(createTrackDto);
   }
 
   findAll() {
@@ -20,7 +20,7 @@ export class TrackService {
   }
 
   update(id: string, updateTrackDto: UpdateTrackDto) {
-    this.dbService.updateTrack(id, updateTrackDto);
+    return this.dbService.updateTrack(id, updateTrackDto);
   }
 
   remove(id: string) {

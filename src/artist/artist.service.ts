@@ -8,7 +8,7 @@ export class ArtistService {
   constructor(private readonly dbService: dbService) {}
 
   create(createArtistDto: CreateArtistDto) {
-    this.dbService.createArtist(createArtistDto);
+    return this.dbService.createArtist(createArtistDto);
   }
 
   findAll() {
@@ -20,7 +20,7 @@ export class ArtistService {
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto) {
-    this.dbService.updateArtist(id, updateArtistDto);
+    return this.dbService.updateArtist(id, updateArtistDto);
   }
 
   remove(id: string) {

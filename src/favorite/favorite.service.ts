@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Artist } from 'src/artist/entities/artist.entity';
 import { dbService } from 'src/db/db.service';
 
 @Injectable()
@@ -9,27 +10,27 @@ export class FavoriteService {
     return this.dbService.findAllFavorites();
   }
 
-  addArtist(id: string) {
-    this.dbService.addArtistInFavorite(id);
+  addArtist(id: string): Artist | undefined {
+    return this.dbService.addArtistInFavorite(id);
   }
 
   addAlbum(id: string) {
-    this.dbService.addAlbumInFavorites(id);
+    return this.dbService.addAlbumInFavorites(id);
   }
 
   addTrack(id: string) {
-    this.dbService.addTrackInFavorites(id);
+    return this.dbService.addTrackInFavorites(id);
   }
 
   deleteArtist(id: string) {
-    this.dbService.deleteArtistFromFavorites(id);
+    return this.dbService.deleteArtistFromFavorites(id);
   }
 
   deleteAlbum(id: string) {
-    this.dbService.deleteAlbumFromFavorites(id);
+    return this.dbService.deleteAlbumFromFavorites(id);
   }
 
   deleteTrack(id: string) {
-    this.dbService.deleteTrackFromFavorites(id);
+    return this.dbService.deleteTrackFromFavorites(id);
   }
 }

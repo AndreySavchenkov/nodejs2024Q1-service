@@ -8,7 +8,7 @@ export class UserService {
   constructor(private readonly dbService: dbService) {}
 
   create(user: CreateUserDto) {
-    this.dbService.createUser(user);
+    return this.dbService.createUser(user);
   }
 
   findAll() {
@@ -20,10 +20,10 @@ export class UserService {
   }
 
   updatePassword(id: string, dto: UpdatePasswordDto) {
-    this.dbService.updatePassword(id, dto);
+    return this.dbService.updatePassword(id, dto);
   }
 
   delete(id: string) {
-    this.dbService.deleteUser(id);
+    return this.dbService.deleteUser(id);
   }
 }

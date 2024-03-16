@@ -8,7 +8,7 @@ export class AlbumService {
   constructor(private readonly dbService: dbService) {}
 
   create(createAlbumDto: CreateAlbumDto) {
-    this.dbService.createAlbum(createAlbumDto);
+    return this.dbService.createAlbum(createAlbumDto);
   }
 
   findAll() {
@@ -20,7 +20,7 @@ export class AlbumService {
   }
 
   update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    this.dbService.updateAlbum(id, updateAlbumDto);
+    return this.dbService.updateAlbum(id, updateAlbumDto);
   }
 
   remove(id: string) {

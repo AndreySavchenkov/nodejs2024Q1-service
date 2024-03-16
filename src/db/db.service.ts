@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateAlbumDto } from 'src/album/dto/create-album.dto';
 import { UpdateAlbumDto } from 'src/album/dto/update-album.dto';
@@ -31,15 +30,20 @@ export class dbService {
     tracks: [],
   };
 
-  createUser(user: CreateUserDto): void {
-    this.users.push({
+  createUser(user: CreateUserDto) {
+    const newUser = {
       login: user.login,
       password: user.password,
       id: uuid(),
       version: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-    });
+    };
+
+    this.users.push(newUser);
+    const { password, ...userWithoutPassword } = newUser;
+
+    return userWithoutPassword;
   }
 
   findAllUsers(): Omit<User, 'password'>[] {
@@ -56,11 +60,15 @@ export class dbService {
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
+
     const { password, ...rest } = user;
 
-    const userWithoutPassword: Omit<User, 'password'> = { ...rest };
+    return rest;
+  }
 
-    return userWithoutPassword;
+  getPassword(id: string) {
+    const user = this.users.find((user) => user.id === id);
+    return user.password;
   }
 
   updatePassword(id: string, dto: UpdatePasswordDto) {
@@ -77,6 +85,10 @@ export class dbService {
     this.users[userIndex].password = dto.newPassword;
     this.users[userIndex].updatedAt = Date.now();
     this.users[userIndex].version++;
+
+    const user = this.users[userIndex];
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 
   deleteUser(id: string) {
@@ -95,11 +107,11 @@ export class dbService {
 
   createArtist(createArtistDto: CreateArtistDto) {
     const { name, grammy } = createArtistDto;
-    this.artists.push({
-      id: uuid(),
-      name,
-      grammy,
-    });
+
+    const artist = { id: uuid(), name, grammy };
+    this.artists.push(artist);
+
+    return artist;
   }
 
   findAllArtist() {
@@ -131,11 +143,15 @@ export class dbService {
       throw new NotFoundException(`Artist with id ${id} not found`);
     }
 
-    this.artists[artistIndex] = {
+    const newArtistInfo = {
       id: this.artists[artistIndex].id,
       name: updateArtistDto.name,
       grammy: updateArtistDto.grammy,
     };
+
+    this.artists[artistIndex] = newArtistInfo;
+
+    return newArtistInfo;
   }
 
   removeArtist(id: string) {
@@ -154,7 +170,7 @@ export class dbService {
 
     //delete from favorites
     const artistIndexInFavorites = this.favorites.artists.findIndex(
-      (artist) => artist === id,
+      (artist) => artist.id === id,
     );
 
     if (artistIndexInFavorites !== -1) {
@@ -178,13 +194,15 @@ export class dbService {
 
   createTrack(createTrackDto: CreateTrackDto) {
     const { name, artistId, albumId, duration } = createTrackDto;
-    this.tracks.push({
+    const track = {
       id: uuid(),
       name,
       artistId,
       albumId,
       duration,
-    });
+    };
+    this.tracks.push(track);
+    return track;
   }
 
   findAllTracks() {
@@ -205,6 +223,10 @@ export class dbService {
     return track;
   }
 
+  getTrackForUpdate(id: string) {
+    return this.tracks.find((track) => track.id === id);
+  }
+
   updateTrack(id: string, updateTrackDto: UpdateTrackDto) {
     if (!validate(id)) {
       throw new BadRequestException('Id not UUID type');
@@ -216,13 +238,17 @@ export class dbService {
       throw new NotFoundException(`Track with id ${id} not found`);
     }
 
-    this.tracks[trackIndex] = {
+    const updatedTrack = {
       id: this.tracks[trackIndex].id,
       name: updateTrackDto.name,
       artistId: updateTrackDto.artistId,
       albumId: updateTrackDto.albumId,
       duration: updateTrackDto.duration,
     };
+
+    this.tracks[trackIndex] = updatedTrack;
+
+    return updatedTrack;
   }
 
   removeTrack(id: string) {
@@ -240,7 +266,7 @@ export class dbService {
 
     //delete from favorites
     const trackIndexInFavorites = this.favorites.tracks.findIndex(
-      (track) => track === id,
+      (track) => track.id === id,
     );
 
     if (trackIndexInFavorites !== -1) {
@@ -250,12 +276,17 @@ export class dbService {
 
   createAlbum(createAlbumDto: CreateAlbumDto) {
     const { name, artistId, year } = createAlbumDto;
-    this.albums.push({
+
+    const album = {
       id: uuid(),
       name,
       year,
       artistId: artistId || null,
-    });
+    };
+
+    this.albums.push(album);
+
+    return album;
   }
 
   findAllAlbums() {
@@ -287,12 +318,16 @@ export class dbService {
       throw new NotFoundException(`Album with id ${id} not found`);
     }
 
-    this.albums[albumIndex] = {
+    const newAlbum = {
       id: this.albums[albumIndex].id,
       name: updateAlbumDto.name,
       year: updateAlbumDto.year,
       artistId: updateAlbumDto.artistId,
     };
+
+    this.albums[albumIndex] = newAlbum;
+
+    return newAlbum;
   }
 
   removeAlbum(id: string) {
@@ -310,7 +345,7 @@ export class dbService {
 
     //delete from favorites
     const albumIndexInFavorites = this.favorites.albums.findIndex(
-      (album) => album === id,
+      (album) => album.id === id,
     );
 
     if (albumIndexInFavorites !== -1) {
@@ -326,122 +361,77 @@ export class dbService {
   }
 
   findAllFavorites() {
-    const { artists, tracks, albums } = this.favorites;
+    return this.favorites;
+  }
 
-    const allArtists = this.findAllArtist();
-    const favoriteArtists = allArtists.filter((artist) =>
-      artists.includes(artist.id),
+  addArtistInFavorite(id: string): Artist | undefined {
+    const artist = this.artists.find((artist) => artist.id === id);
+
+    if (artist) {
+      this.favorites.artists = [...this.favorites.artists, artist];
+    }
+
+    return artist;
+  }
+
+  addAlbumInFavorites(id: string): Album | undefined {
+    const album = this.albums.find((album) => album.id === id);
+
+    if (album) {
+      this.favorites.albums = [...this.favorites.albums, album];
+    }
+
+    return album;
+  }
+
+  addTrackInFavorites(id: string): Track | undefined {
+    const track = this.tracks.find((track) => track.id === id);
+
+    if (track) {
+      this.favorites.tracks = [...this.favorites.tracks, track];
+    }
+
+    return track;
+  }
+
+  deleteArtistFromFavorites(id: string): Artist | undefined {
+    const index = this.favorites.artists.findIndex(
+      (artist) => artist.id === id,
     );
 
-    const allAlbums = this.findAllAlbums();
-    const favoriteAlbums = allAlbums.filter((album) =>
-      albums.includes(album.id),
-    );
+    if (index === -1) {
+      return undefined;
+    }
 
-    const allTracks = this.findAllTracks();
-    const favoriteTracks = allTracks.filter((track) =>
-      tracks.includes(track.id),
-    );
+    const artist = this.favorites.artists[index];
+    this.favorites.artists.splice(index, 1);
 
-    return {
-      artists: favoriteArtists,
-      tracks: favoriteTracks,
-      albums: favoriteAlbums,
-    };
+    return artist;
   }
 
-  addArtistInFavorite(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
+  deleteAlbumFromFavorites(id: string): Album | undefined {
+    const index = this.favorites.albums.findIndex((album) => album.id === id);
+
+    if (index === -1) {
+      return undefined;
     }
 
-    const allArtists = this.findAllArtist();
+    const album = this.favorites.albums[index];
+    this.favorites.albums.splice(index, 1);
 
-    const artistIndex = allArtists.findIndex((artist) => artist.id === id);
-
-    if (artistIndex === -1) {
-      throw new UnprocessableEntityException(
-        `The artist with an id ${id} does not exist.`,
-      );
-    }
-
-    this.favorites.artists.push(id);
+    return album;
   }
 
-  addAlbumInFavorites(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
+  deleteTrackFromFavorites(id: string): Track | undefined {
+    const index = this.favorites.tracks.findIndex((track) => track.id === id);
+
+    if (index === -1) {
+      return undefined;
     }
 
-    const allAlbums = this.findAllAlbums();
+    const track = this.favorites.tracks[index];
+    this.favorites.tracks.splice(index, 1);
 
-    const albumIndex = allAlbums.findIndex((album) => album.id === id);
-
-    if (albumIndex === -1) {
-      throw new UnprocessableEntityException(
-        `The album with an id ${id} does not exist.`,
-      );
-    }
-
-    this.favorites.albums.push(id);
-  }
-
-  addTrackInFavorites(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
-
-    const allTracks = this.findAllTracks();
-
-    const trackIndex = allTracks.findIndex((track) => track.id === id);
-
-    if (trackIndex === -1) {
-      throw new UnprocessableEntityException(
-        `The track with an id ${id} does not exist.`,
-      );
-    }
-
-    this.favorites.tracks.push(id);
-  }
-
-  deleteArtistFromFavorites(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
-    const artistIndex = this.favorites.artists.findIndex(
-      (artist) => artist === id,
-    );
-
-    if (artistIndex === -1) {
-      throw new NotFoundException(`Artist with id ${id} not found`);
-    }
-
-    this.favorites.artists.splice(artistIndex, 1);
-  }
-
-  deleteAlbumFromFavorites(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
-    const albumIndex = this.favorites.albums.findIndex((album) => album === id);
-
-    if (albumIndex === -1) {
-      throw new NotFoundException(`Album with id ${id} not found`);
-    }
-
-    this.favorites.albums.splice(albumIndex, 1);
-  }
-
-  deleteTrackFromFavorites(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
-    const trackIndex = this.favorites.tracks.findIndex((track) => track === id);
-
-    if (trackIndex === -1) {
-      throw new NotFoundException(`Track with id ${id} not found`);
-    }
-
-    this.favorites.tracks.splice(trackIndex, 1);
+    return track;
   }
 }
