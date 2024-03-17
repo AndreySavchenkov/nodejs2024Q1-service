@@ -12,56 +12,61 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { Response } from 'express';
 import { dbService } from 'src/db/db.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { validate } from 'uuid';
 
 @Controller('user')
 export class UserController {
   constructor(
     private userService: UserService,
     private readonly dbService: dbService,
+    private prismaService: PrismaService,
   ) {}
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
-    const user = this.userService.create(createUserDto);
+    const user = await this.userService.create(createUserDto);
     res.status(HttpStatus.CREATED).json(user).send();
-    return;
+    return user;
   }
 
   @Get()
-  async findAll(): Promise<Omit<User, 'password'>[]> {
+  async findAll() {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Omit<User, 'password'>> {
+  async findOne(@Param('id') id: string) {
     return this.userService.findById(id);
   }
 
   @Put(':id')
-  updatePassword(
+  async updatePassword(
     @Param('id') id: string,
     @Body() dto: UpdatePasswordDto,
     @Res() res: Response,
   ) {
-    const user = this.dbService.findUserById(id);
+    if (!validate(id)) {
+      res.status(HttpStatus.BAD_REQUEST).send();
+      return;
+    }
+
+    const user = await this.prismaService.getUserById(id);
 
     if (!user) {
       res.status(HttpStatus.NOT_FOUND).send();
       return;
     }
 
-    const passwordFromDB = this.dbService.getPassword(id);
-
-    if (passwordFromDB !== dto.oldPassword) {
+    if (user.password !== dto.oldPassword) {
       res.status(HttpStatus.FORBIDDEN).send();
       return;
     }
 
-    const updatedUser = this.userService.updatePassword(id, dto);
+    const updatedUser = await this.userService.updatePassword(id, dto);
 
     if (updatedUser) {
       res.status(HttpStatus.OK).json(updatedUser).send();

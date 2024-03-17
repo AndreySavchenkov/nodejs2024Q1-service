@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { dbService } from 'src/db/db.service';
@@ -12,36 +16,94 @@ export class UserService {
     private readonly prismaService: PrismaService,
   ) {}
 
-  create(user: CreateUserDto) {
-    const newUser = {
+  async create(user: CreateUserDto) {
+    const newId = uuid();
+
+    const now = Date.now();
+
+    const newUserInfo = {
       login: user.login,
       password: user.password,
-      id: uuid(),
+      id: newId,
       version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      //TODO:  fix on date
+      createdAt: 1,
+      updatedAt: 1,
     };
 
-    this.prismaService.createUser(newUser);
+    try {
+      await this.prismaService.createUser(newUserInfo);
 
-    const { password, ...userWithoutPassword } = newUser;
+      const createdUser = await this.prismaService.getUserById(newId);
 
-    return userWithoutPassword;
+      delete createdUser.password;
+
+      return createdUser;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  findAll() {
-    return this.dbService.findAllUsers();
+  async findAll() {
+    try {
+      return this.prismaService.getAllUsers();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  findById(id: string) {
-    return this.dbService.findUserById(id);
+  async findById(id: string) {
+    if (!validate(id)) {
+      throw new BadRequestException('Id not UUID type');
+    }
+
+    const user = await this.prismaService.getUserById(id);
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    return user;
   }
 
-  updatePassword(id: string, dto: UpdatePasswordDto) {
-    return this.dbService.updatePassword(id, dto);
+  async updatePassword(id: string, dto: UpdatePasswordDto) {
+    if (!validate(id)) {
+      throw new BadRequestException('Id not UUID type');
+    }
+
+    const user = await this.prismaService.getUserById(id);
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    const newUserDto = {
+      password: dto.newPassword,
+      version: ++user.version,
+      //TODO: fix on date
+      updatedAt: ++user.updatedAt,
+    };
+
+    await this.prismaService.updatePassword(id, newUserDto);
+
+    const newUser = await this.prismaService.getUserById(id);
+
+    delete newUser.password;
+
+    return newUser;
   }
 
-  delete(id: string) {
-    return this.dbService.deleteUser(id);
+  async delete(id: string) {
+    if (!validate(id)) {
+      throw new BadRequestException('Id not UUID type');
+    }
+
+    const user = await this.prismaService.getUserById(id);
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    await this.prismaService.delete(id);
   }
 }

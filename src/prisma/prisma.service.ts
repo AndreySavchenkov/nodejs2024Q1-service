@@ -1,7 +1,7 @@
 // prisma.service.ts
 
 import { Injectable } from '@nestjs/common';
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService {
@@ -11,10 +11,36 @@ export class PrismaService {
     this.prisma = new PrismaClient();
   }
 
-  async createUser(data: User) {
+  async createUser(data: any) {
     return this.prisma.user.create({
       data,
     });
+  }
+
+  async getAllUsers() {
+    return this.prisma.user.findMany();
+  }
+
+  async getUserById(id: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async updatePassword(id: string, dto: any) {
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        password: dto.password,
+        version: dto.version,
+      },
+    });
+  }
+
+  async delete(id: string) {
+    return this.prisma.user.delete({ where: { id } });
   }
 
   async onClose() {

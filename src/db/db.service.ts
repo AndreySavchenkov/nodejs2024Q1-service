@@ -20,7 +20,7 @@ import { v4 as uuid, validate } from 'uuid';
 
 @Injectable()
 export class dbService {
-  private readonly users: User[] = [];
+  // private readonly users: User[] = [];
   private readonly artists: Artist[] = [];
   private readonly tracks: Track[] = [];
   private readonly albums: Album[] = [];
@@ -30,80 +30,80 @@ export class dbService {
     tracks: [],
   };
 
-  createUser(user: CreateUserDto) {
-    const newUser = {
-      login: user.login,
-      password: user.password,
-      id: uuid(),
-      version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
+  // createUser(user: CreateUserDto) {
+  //   const newUser = {
+  //     login: user.login,
+  //     password: user.password,
+  //     id: uuid(),
+  //     version: 1,
+  //     createdAt: Date.now(),
+  //     updatedAt: Date.now(),
+  //   };
 
-    this.users.push(newUser);
-    const { password, ...userWithoutPassword } = newUser;
+  //   this.users.push(newUser);
+  //   const { password, ...userWithoutPassword } = newUser;
 
-    return userWithoutPassword;
-  }
+  //   return userWithoutPassword;
+  // }
 
-  findAllUsers(): Omit<User, 'password'>[] {
-    return this.users.map(({ password, ...rest }) => rest);
-  }
+  // findAllUsers(): Omit<User, 'password'>[] {
+  //   return this.users.map(({ password, ...rest }) => rest);
+  // }
 
-  findUserById(id: string): Omit<User, 'password'> {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
+  // findUserById(id: string): Omit<User, 'password'> {
+  //   if (!validate(id)) {
+  //     throw new BadRequestException('Id not UUID type');
+  //   }
 
-    const user = this.users.find((user) => user.id === id);
+  //   const user = this.users.find((user) => user.id === id);
 
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
+  //   if (!user) {
+  //     throw new NotFoundException(`User with id ${id} not found`);
+  //   }
 
-    const { password, ...rest } = user;
+  //   const { password, ...rest } = user;
 
-    return rest;
-  }
+  //   return rest;
+  // }
 
-  getPassword(id: string) {
-    const user = this.users.find((user) => user.id === id);
-    return user.password;
-  }
+  // getPassword(id: string) {
+  //   const user = this.users.find((user) => user.id === id);
+  //   return user.password;
+  // }
 
-  updatePassword(id: string, dto: UpdatePasswordDto) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
+  // updatePassword(id: string, dto: UpdatePasswordDto) {
+  //   if (!validate(id)) {
+  //     throw new BadRequestException('Id not UUID type');
+  //   }
 
-    const userIndex = this.users.findIndex((user) => user.id === id);
+  //   const userIndex = this.users.findIndex((user) => user.id === id);
 
-    if (userIndex === -1) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
+  //   if (userIndex === -1) {
+  //     throw new NotFoundException(`User with id ${id} not found`);
+  //   }
 
-    this.users[userIndex].password = dto.newPassword;
-    this.users[userIndex].updatedAt = Date.now();
-    this.users[userIndex].version++;
+  //   this.users[userIndex].password = dto.newPassword;
+  //   // this.users[userIndex].updatedAt = Date.now();
+  //   this.users[userIndex].version++;
 
-    const user = this.users[userIndex];
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
-  }
+  //   const user = this.users[userIndex];
+  //   const { password, ...userWithoutPassword } = user;
+  //   return userWithoutPassword;
+  // }
 
-  deleteUser(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
+  // deleteUser(id: string) {
+  //   if (!validate(id)) {
+  //     throw new BadRequestException('Id not UUID type');
+  //   }
 
-    const userIndex = this.users.findIndex((user) => user.id === id);
+  //   const userIndex = this.users.findIndex((user) => user.id === id);
 
-    if (userIndex === -1) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
+  //   if (userIndex === -1) {
+  //     throw new NotFoundException(`User with id ${id} not found`);
+  //   }
 
-    this.users.splice(userIndex, 1);
-  }
+  //   this.users.splice(userIndex, 1);
+  // }
 
   createArtist(createArtistDto: CreateArtistDto) {
     const { name, grammy } = createArtistDto;
