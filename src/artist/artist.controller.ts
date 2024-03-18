@@ -21,7 +21,7 @@ export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
   @Post()
-  create(@Body() createArtistDto: CreateArtistDto, @Res() res: Response) {
+  async create(@Body() createArtistDto: CreateArtistDto, @Res() res: Response) {
     if (
       !(
         Object.keys(createArtistDto).length === 2 &&
@@ -35,14 +35,13 @@ export class ArtistController {
       return;
     }
 
-    const artist = this.artistService.create(createArtistDto);
-    console.log(`artist name --->>> ${artist.name}`);
+    const artist = await this.artistService.create(createArtistDto);
     res.status(HttpStatus.CREATED).json(artist).send();
     return artist;
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.artistService.findAll();
   }
 
@@ -52,19 +51,19 @@ export class ArtistController {
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateArtistDto: UpdateArtistDto,
     @Res() res: Response,
   ) {
-    const updatedArtist = this.artistService.update(id, updateArtistDto);
+    const updatedArtist = await this.artistService.update(id, updateArtistDto);
     res.status(HttpStatus.OK).json(updatedArtist).send();
     return updatedArtist;
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
-    return this.artistService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.artistService.remove(id);
   }
 }

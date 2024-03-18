@@ -1,5 +1,3 @@
-// prisma.service.ts
-
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
@@ -11,10 +9,9 @@ export class PrismaService {
     this.prisma = new PrismaClient();
   }
 
+  //FIXME: change type
   async createUser(data: any) {
-    return this.prisma.user.create({
-      data,
-    });
+    return this.prisma.user.create({ data });
   }
 
   async getAllUsers() {
@@ -29,6 +26,7 @@ export class PrismaService {
     });
   }
 
+  //FIXME: change type
   async updatePassword(id: string, dto: any) {
     return this.prisma.user.update({
       where: { id },
@@ -39,8 +37,40 @@ export class PrismaService {
     });
   }
 
-  async delete(id: string) {
+  async deleteUser(id: string) {
     return this.prisma.user.delete({ where: { id } });
+  }
+
+  //FIXME: change type
+  async createArtist(data: any) {
+    return this.prisma.artist.create({ data });
+  }
+
+  async getAllArtists() {
+    return this.prisma.artist.findMany();
+  }
+
+  async getArtistById(id: string) {
+    return this.prisma.artist.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
+  //FIXME: change type
+  async updateArtist(id: string, dto: any) {
+    return await this.prisma.artist.update({
+      where: { id },
+      data: {
+        name: dto.name,
+        grammy: dto.grammy,
+      },
+    });
+  }
+
+  async deleteArtist(id: string) {
+    return this.prisma.artist.delete({ where: { id } });
   }
 
   async onClose() {

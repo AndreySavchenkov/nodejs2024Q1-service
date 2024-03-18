@@ -98,6 +98,6 @@ export class UserService {
       throw new NotFoundException(`User with id ${id} not found`);
     }
 
-    await this.prismaService.delete(id);
+    await this.prismaService.deleteUser(id);
   }
 }

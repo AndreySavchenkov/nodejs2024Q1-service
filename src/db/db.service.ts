@@ -105,92 +105,91 @@ export class dbService {
   //   this.users.splice(userIndex, 1);
   // }
 
-  createArtist(createArtistDto: CreateArtistDto) {
-    const { name, grammy } = createArtistDto;
+  // createArtist(createArtistDto: CreateArtistDto) {
+  //   const { name, grammy } = createArtistDto;
 
-    const artist = { id: uuid(), name, grammy };
-    this.artists.push(artist);
+  //   const artist = { id: uuid(), name, grammy };
+  //   this.artists.push(artist);
 
-    return artist;
-  }
+  //   return artist;
+  // }
 
-  findAllArtist() {
-    return this.artists;
-  }
+  // findAllArtist() {
+  //   return this.artists;
+  // }
 
-  findArtistById(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
+  // findArtistById(id: string) {
+  //   if (!validate(id)) {
+  //     throw new BadRequestException('Id not UUID type');
+  //   }
 
-    const artist = this.artists.find((track) => track.id === id);
+  //   const artist = this.artists.find((track) => track.id === id);
 
-    if (!artist) {
-      throw new NotFoundException(`Artist with id ${id} not found`);
-    }
+  //   if (!artist) {
+  //     throw new NotFoundException(`Artist with id ${id} not found`);
+  //   }
 
-    return artist;
-  }
+  //   return artist;
+  // }
 
-  updateArtist(id: string, updateArtistDto: UpdateArtistDto) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
+  // updateArtist(id: string, updateArtistDto: UpdateArtistDto) {
+  //   if (!validate(id)) {
+  //     throw new BadRequestException('Id not UUID type');
+  //   }
 
-    const artistIndex = this.artists.findIndex((artist) => artist.id === id);
+  //   const artistIndex = this.artists.findIndex((artist) => artist.id === id);
 
-    if (artistIndex === -1) {
-      throw new NotFoundException(`Artist with id ${id} not found`);
-    }
+  //   if (artistIndex === -1) {
+  //     throw new NotFoundException(`Artist with id ${id} not found`);
+  //   }
 
-    const newArtistInfo = {
-      id: this.artists[artistIndex].id,
-      name: updateArtistDto.name,
-      grammy: updateArtistDto.grammy,
-    };
+  //   const newArtistInfo = {
+  //     id: this.artists[artistIndex].id,
+  //     name: updateArtistDto.name,
+  //     grammy: updateArtistDto.grammy,
+  //   };
 
-    this.artists[artistIndex] = newArtistInfo;
+  //   this.artists[artistIndex] = newArtistInfo;
 
-    return newArtistInfo;
-  }
+  //   return newArtistInfo;
+  // }
 
-  removeArtist(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
+  // async removeArtist(id: string) {
+  //   if (!validate(id)) {
+  //     throw new BadRequestException('Id not UUID type');
+  //   }
 
-    const artistIndex = this.artists.findIndex((artist) => artist.id === id);
-    console.log('artistIndex ->', artistIndex);
+  //   const artist = await this.artists.findIndex((artist) => artist.id === id);
 
-    if (artistIndex === -1) {
-      throw new NotFoundException(`Artist with id ${id} not found`);
-    }
+  //   if (artistIndex === -1) {
+  //     throw new NotFoundException(`Artist with id ${id} not found`);
+  //   }
 
-    this.artists.splice(artistIndex, 1);
+  //   this.artists.splice(artistIndex, 1);
 
-    //delete from favorites
-    const artistIndexInFavorites = this.favorites.artists.findIndex(
-      (artist) => artist.id === id,
-    );
+  //   //delete from favorites
+  //   const artistIndexInFavorites = this.favorites.artists.findIndex(
+  //     (artist) => artist.id === id,
+  //   );
 
-    if (artistIndexInFavorites !== -1) {
-      this.favorites.artists.splice(artistIndexInFavorites, 1);
-    }
+  //   if (artistIndexInFavorites !== -1) {
+  //     this.favorites.artists.splice(artistIndexInFavorites, 1);
+  //   }
 
-    //artistId: null in tracks
-    for (let i = this.tracks.length - 1; i >= 0; i--) {
-      if (this.tracks[i].artistId === id) {
-        this.tracks[i].artistId = null;
-      }
-    }
+  //   //artistId: null in tracks
+  //   for (let i = this.tracks.length - 1; i >= 0; i--) {
+  //     if (this.tracks[i].artistId === id) {
+  //       this.tracks[i].artistId = null;
+  //     }
+  //   }
 
-    //artistId: null in albums
-    for (let i = this.albums.length - 1; i >= 0; i--) {
-      if (this.albums[i].artistId === id) {
-        this.albums[i].artistId = null;
-      }
-    }
-  }
+  //   //artistId: null in albums
+  //   for (let i = this.albums.length - 1; i >= 0; i--) {
+  //     if (this.albums[i].artistId === id) {
+  //       this.albums[i].artistId = null;
+  //     }
+  //   }
+  // }
 
   createTrack(createTrackDto: CreateTrackDto) {
     const { name, artistId, albumId, duration } = createTrackDto;
