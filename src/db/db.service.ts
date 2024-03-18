@@ -191,87 +191,87 @@ export class dbService {
   //   }
   // }
 
-  createTrack(createTrackDto: CreateTrackDto) {
-    const { name, artistId, albumId, duration } = createTrackDto;
-    const track = {
-      id: uuid(),
-      name,
-      artistId,
-      albumId,
-      duration,
-    };
-    this.tracks.push(track);
-    return track;
-  }
+  // createTrack(createTrackDto: CreateTrackDto) {
+  //   const { name, artistId, albumId, duration } = createTrackDto;
+  //   const track = {
+  //     id: uuid(),
+  //     name,
+  //     artistId,
+  //     albumId,
+  //     duration,
+  //   };
+  //   this.tracks.push(track);
+  //   return track;
+  // }
 
-  findAllTracks() {
-    return this.tracks;
-  }
+  // findAllTracks() {
+  //   return this.tracks;
+  // }
 
-  findTrackById(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
+  // findTrackById(id: string) {
+  //   if (!validate(id)) {
+  //     throw new BadRequestException('Id not UUID type');
+  //   }
 
-    const track = this.tracks.find((track) => track.id === id);
+  //   const track = this.tracks.find((track) => track.id === id);
 
-    if (!track) {
-      throw new NotFoundException(`Track with id ${id} not found`);
-    }
+  //   if (!track) {
+  //     throw new NotFoundException(`Track with id ${id} not found`);
+  //   }
 
-    return track;
-  }
+  //   return track;
+  // }
 
-  getTrackForUpdate(id: string) {
-    return this.tracks.find((track) => track.id === id);
-  }
+  // getTrackForUpdate(id: string) {
+  //   return this.tracks.find((track) => track.id === id);
+  // }
 
-  updateTrack(id: string, updateTrackDto: UpdateTrackDto) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
+  // updateTrack(id: string, updateTrackDto: UpdateTrackDto) {
+  //   if (!validate(id)) {
+  //     throw new BadRequestException('Id not UUID type');
+  //   }
 
-    const trackIndex = this.tracks.findIndex((track) => track.id === id);
+  //   const trackIndex = this.tracks.findIndex((track) => track.id === id);
 
-    if (trackIndex === -1) {
-      throw new NotFoundException(`Track with id ${id} not found`);
-    }
+  //   if (trackIndex === -1) {
+  //     throw new NotFoundException(`Track with id ${id} not found`);
+  //   }
 
-    const updatedTrack = {
-      id: this.tracks[trackIndex].id,
-      name: updateTrackDto.name,
-      artistId: updateTrackDto.artistId,
-      albumId: updateTrackDto.albumId,
-      duration: updateTrackDto.duration,
-    };
+  //   const updatedTrack = {
+  //     id: this.tracks[trackIndex].id,
+  //     name: updateTrackDto.name,
+  //     artistId: updateTrackDto.artistId,
+  //     albumId: updateTrackDto.albumId,
+  //     duration: updateTrackDto.duration,
+  //   };
 
-    this.tracks[trackIndex] = updatedTrack;
+  //   this.tracks[trackIndex] = updatedTrack;
 
-    return updatedTrack;
-  }
+  //   return updatedTrack;
+  // }
 
-  removeTrack(id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Id not UUID type');
-    }
+  // removeTrack(id: string) {
+  //   if (!validate(id)) {
+  //     throw new BadRequestException('Id not UUID type');
+  //   }
 
-    const trackIndex = this.tracks.findIndex((track) => track.id === id);
+  //   const trackIndex = this.tracks.findIndex((track) => track.id === id);
 
-    if (trackIndex === -1) {
-      throw new NotFoundException(`Track with id ${id} not found`);
-    }
+  //   if (trackIndex === -1) {
+  //     throw new NotFoundException(`Track with id ${id} not found`);
+  //   }
 
-    this.tracks.splice(trackIndex, 1);
+  //   this.tracks.splice(trackIndex, 1);
 
-    //delete from favorites
-    const trackIndexInFavorites = this.favorites.tracks.findIndex(
-      (track) => track.id === id,
-    );
+  //   //delete from favorites
+  //   const trackIndexInFavorites = this.favorites.tracks.findIndex(
+  //     (track) => track.id === id,
+  //   );
 
-    if (trackIndexInFavorites !== -1) {
-      this.favorites.tracks.splice(trackIndexInFavorites, 1);
-    }
-  }
+  //   if (trackIndexInFavorites !== -1) {
+  //     this.favorites.tracks.splice(trackIndexInFavorites, 1);
+  //   }
+  // }
 
   createAlbum(createAlbumDto: CreateAlbumDto) {
     const { name, artistId, year } = createAlbumDto;

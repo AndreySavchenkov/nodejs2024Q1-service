@@ -15,17 +15,17 @@ import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Response } from 'express';
 import { isNumber, isString, isUUID } from 'class-validator';
-import { dbService } from 'src/db/db.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Controller('track')
 export class TrackController {
   constructor(
     private readonly trackService: TrackService,
-    private readonly dbService: dbService,
+    private readonly prismaService: PrismaService,
   ) {}
 
   @Post()
-  create(@Body() createTrackDto: CreateTrackDto, @Res() res: Response) {
+  async create(@Body() createTrackDto: CreateTrackDto, @Res() res: Response) {
     if (
       !(
         Object.keys(createTrackDto).length === 4 &&
@@ -45,26 +45,26 @@ export class TrackController {
       return;
     }
 
-    const track = this.trackService.create(createTrackDto);
+    const track = await this.trackService.create(createTrackDto);
 
     res.status(HttpStatus.CREATED).json(track).send();
   }
 
   @Get()
-  findAll() {
-    return this.trackService.findAll();
+  async findAll() {
+    return await this.trackService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @Res() res: Response) {
-    const track = this.trackService.findOne(id);
+  async findOne(@Param('id') id: string, @Res() res: Response) {
+    const track = await this.trackService.findOne(id);
     if (track) {
       res.status(HttpStatus.OK).json(track).send();
     }
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateTrackDto: UpdateTrackDto,
     @Res() res: Response,
@@ -93,14 +93,17 @@ export class TrackController {
       return;
     }
 
-    const track = this.dbService.getTrackForUpdate(id);
+    const track = await this.prismaService.getTrackById(id);
 
     if (!track) {
       res.status(HttpStatus.NOT_FOUND).send();
       return;
     }
 
-    const updatedTrack = this.trackService.update(id, updateTrackDto);
+    await this.trackService.update(id, updateTrackDto);
+
+    const updatedTrack = await this.prismaService.getTrackById(id);
+
     res.status(HttpStatus.OK).json(updatedTrack).send();
 
     return updatedTrack;

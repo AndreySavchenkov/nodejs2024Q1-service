@@ -9,6 +9,8 @@ export class PrismaService {
     this.prisma = new PrismaClient();
   }
 
+  /* USER */
+
   //FIXME: change type
   async createUser(data: any) {
     return this.prisma.user.create({ data });
@@ -41,6 +43,8 @@ export class PrismaService {
     return this.prisma.user.delete({ where: { id } });
   }
 
+  /* ARTIST */
+
   //FIXME: change type
   async createArtist(data: any) {
     return this.prisma.artist.create({ data });
@@ -71,6 +75,42 @@ export class PrismaService {
 
   async deleteArtist(id: string) {
     return this.prisma.artist.delete({ where: { id } });
+  }
+
+  /* TRACK */
+
+  //FIXME: change type
+  async createTrack(data: any) {
+    return await this.prisma.track.create({ data });
+  }
+
+  async getAllTracks() {
+    return this.prisma.track.findMany();
+  }
+
+  async getTrackById(id: string) {
+    return this.prisma.track.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
+  //FIXME: change type
+  async updateTrack(id: string, dto: any) {
+    return await this.prisma.track.update({
+      where: { id },
+      data: {
+        name: dto.name,
+        artistId: dto.artistId,
+        duration: dto.duration,
+        albumId: dto.albumId,
+      },
+    });
+  }
+
+  async deleteTrack(id: string) {
+    return this.prisma.track.delete({ where: { id } });
   }
 
   async onClose() {
