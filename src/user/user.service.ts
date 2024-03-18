@@ -5,28 +5,22 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { dbService } from 'src/db/db.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuid, validate } from 'uuid';
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly dbService: dbService,
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(user: CreateUserDto) {
     const newId = uuid();
-
-    const now = Date.now();
 
     const newUserInfo = {
       login: user.login,
       password: user.password,
       id: newId,
       version: 1,
-      //TODO:  fix on date
+      //FIXME:  fix on date
       createdAt: 1,
       updatedAt: 1,
     };
@@ -80,7 +74,7 @@ export class UserService {
     const newUserDto = {
       password: dto.newPassword,
       version: ++user.version,
-      //TODO: fix on date
+      //FIXME: fix on date
       updatedAt: ++user.updatedAt,
     };
 

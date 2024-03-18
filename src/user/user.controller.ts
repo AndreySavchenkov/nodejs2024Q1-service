@@ -14,7 +14,6 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { Response } from 'express';
-import { dbService } from 'src/db/db.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { validate } from 'uuid';
 
@@ -22,7 +21,6 @@ import { validate } from 'uuid';
 export class UserController {
   constructor(
     private userService: UserService,
-    private readonly dbService: dbService,
     private prismaService: PrismaService,
   ) {}
 
