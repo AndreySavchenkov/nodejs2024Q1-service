@@ -21,7 +21,7 @@ export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
   @Post()
-  create(@Body() createAlbumDto: CreateAlbumDto, @Res() res: Response) {
+  async create(@Body() createAlbumDto: CreateAlbumDto, @Res() res: Response) {
     if (
       !(
         Object.keys(createAlbumDto).length === 3 &&
@@ -37,22 +37,22 @@ export class AlbumController {
       return;
     }
 
-    const album = this.albumService.create(createAlbumDto);
+    const album = await this.albumService.create(createAlbumDto);
     res.status(HttpStatus.CREATED).json(album).send();
   }
 
   @Get()
-  findAll() {
-    return this.albumService.findAll();
+  async findAll() {
+    return await this.albumService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.albumService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.albumService.findOne(id);
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
     @Res() res: Response,
@@ -77,14 +77,7 @@ export class AlbumController {
       return;
     }
 
-    const album = this.albumService.findOne(id);
-
-    if (!album) {
-      res.status(HttpStatus.NOT_FOUND).send();
-      return;
-    }
-
-    const updatedAlbum = this.albumService.update(id, updateAlbumDto);
+    const updatedAlbum = await this.albumService.update(id, updateAlbumDto);
 
     res.status(HttpStatus.OK).json(updatedAlbum).send();
 
@@ -93,7 +86,7 @@ export class AlbumController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
-    return this.albumService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.albumService.remove(id);
   }
 }

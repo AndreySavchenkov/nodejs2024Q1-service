@@ -113,6 +113,41 @@ export class PrismaService {
     return this.prisma.track.delete({ where: { id } });
   }
 
+  /* ALBUM */
+
+  //FIXME: change type
+  async createAlbum(data: any) {
+    return await this.prisma.album.create({ data });
+  }
+
+  async getAllAlbums() {
+    return this.prisma.album.findMany();
+  }
+
+  async getAlbumById(id: string) {
+    return this.prisma.album.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
+  //FIXME: change type
+  async updateAlbum(id: string, dto: any) {
+    return await this.prisma.album.update({
+      where: { id },
+      data: {
+        name: dto.name,
+        year: dto.year,
+        artistId: dto.artistId,
+      },
+    });
+  }
+
+  async deleteAlbum(id: string) {
+    return this.prisma.album.delete({ where: { id } });
+  }
+
   async onClose() {
     await this.prisma.$disconnect();
   }
