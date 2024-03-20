@@ -10,98 +10,112 @@ import {
 import { FavoriteService } from './favorite.service';
 import { Response } from 'express';
 import { isUUID } from 'class-validator';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Controller('favs')
 export class FavoriteController {
-  constructor(private readonly favoriteService: FavoriteService) {}
+  constructor(
+    private readonly favoriteService: FavoriteService,
+    private readonly prismaService: PrismaService,
+  ) {}
 
   @Get()
-  findAll(@Res() res: Response) {
-    const favorites = this.favoriteService.getAll();
+  async findAll(@Res() res: Response) {
+    const favorites = await this.favoriteService.getAll();
     res.status(HttpStatus.OK).json(favorites).send();
   }
 
   @Post('/album/:id')
-  addAlbum(@Param('id') id: string, @Res() res: Response) {
+  async addAlbum(@Param('id') id: string, @Res() res: Response) {
     if (!isUUID(id)) {
       res.status(HttpStatus.BAD_REQUEST).send();
       return;
     }
 
-    const album = this.favoriteService.addAlbum(id);
+    const album = await this.prismaService.getAlbumById(id);
 
     if (!album) {
       res.status(HttpStatus.UNPROCESSABLE_ENTITY).send();
       return;
     }
 
-    res.status(HttpStatus.CREATED).send();
+    await this.favoriteService.addAlbum(id);
+
+    res.status(HttpStatus.CREATED).json(album).send();
   }
 
   @Post('/artist/:id')
-  addArtist(@Param('id') id: string, @Res() res: Response) {
+  async addArtist(@Param('id') id: string, @Res() res: Response) {
     if (!isUUID(id)) {
       res.status(HttpStatus.BAD_REQUEST).send();
       return;
     }
 
-    const artist = this.favoriteService.addArtist(id);
+    const artist = await this.prismaService.getArtistById(id);
 
     if (!artist) {
       res.status(HttpStatus.UNPROCESSABLE_ENTITY).send();
       return;
     }
 
-    res.status(HttpStatus.CREATED).send();
+    await this.favoriteService.addArtist(id);
+
+    res.status(HttpStatus.CREATED).json(artist).send();
   }
 
   @Post('/track/:id')
-  addTrack(@Param('id') id: string, @Res() res: Response) {
+  async addTrack(@Param('id') id: string, @Res() res: Response) {
     if (!isUUID(id)) {
       res.status(HttpStatus.BAD_REQUEST).send();
       return;
     }
 
-    const track = this.favoriteService.addTrack(id);
+    const track = await this.prismaService.getTrackById(id);
 
     if (!track) {
       res.status(HttpStatus.UNPROCESSABLE_ENTITY).send();
       return;
     }
 
-    res.status(HttpStatus.CREATED).send();
+    await this.favoriteService.addTrack(id);
+
+    res.status(HttpStatus.CREATED).json(track).send();
   }
 
   @Delete('/artist/:id')
-  deleteArtist(@Param('id') id: string, @Res() res: Response) {
+  async deleteArtist(@Param('id') id: string, @Res() res: Response) {
     if (!isUUID(id)) {
       res.status(HttpStatus.BAD_REQUEST).send();
       return;
     }
 
-    const artist = this.favoriteService.deleteArtist(id);
+    const artist = await this.prismaService.getArtistById(id);
 
     if (!artist) {
-      res.status(HttpStatus.NOT_FOUND).send();
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).send();
       return;
     }
+
+    await this.favoriteService.deleteArtist(id);
 
     res.status(HttpStatus.NO_CONTENT).send();
   }
 
   @Delete('/album/:id')
-  deleteAlbum(@Param('id') id: string, @Res() res: Response) {
+  async deleteAlbum(@Param('id') id: string, @Res() res: Response) {
     if (!isUUID(id)) {
       res.status(HttpStatus.BAD_REQUEST).send();
       return;
     }
 
-    const album = this.favoriteService.deleteAlbum(id);
+    const album = await this.prismaService.getAlbumById(id);
 
     if (!album) {
-      res.status(HttpStatus.NOT_FOUND).send();
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).send();
       return;
     }
+
+    await this.favoriteService.deleteAlbum(id);
 
     res.status(HttpStatus.NO_CONTENT).send();
   }
@@ -116,7 +130,7 @@ export class FavoriteController {
     const track = this.favoriteService.deleteTrack(id);
 
     if (!track) {
-      res.status(HttpStatus.NOT_FOUND).send();
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).send();
       return;
     }
 

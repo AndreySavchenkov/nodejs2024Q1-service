@@ -5,16 +5,12 @@ import {
 } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { dbService } from 'src/db/db.service';
 import { v4 as uuid, validate } from 'uuid';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AlbumService {
-  constructor(
-    private readonly dbService: dbService,
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async create(createAlbumDto: CreateAlbumDto) {
     const { name, artistId, year } = createAlbumDto;

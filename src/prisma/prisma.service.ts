@@ -13,15 +13,15 @@ export class PrismaService {
 
   //FIXME: change type
   async createUser(data: any) {
-    return this.prisma.user.create({ data });
+    return await this.prisma.user.create({ data });
   }
 
   async getAllUsers() {
-    return this.prisma.user.findMany();
+    return await this.prisma.user.findMany();
   }
 
   async getUserById(id: string) {
-    return this.prisma.user.findUnique({
+    return await this.prisma.user.findUnique({
       where: {
         id,
       },
@@ -30,7 +30,7 @@ export class PrismaService {
 
   //FIXME: change type
   async updatePassword(id: string, dto: any) {
-    return this.prisma.user.update({
+    return await this.prisma.user.update({
       where: { id },
       data: {
         password: dto.password,
@@ -40,22 +40,22 @@ export class PrismaService {
   }
 
   async deleteUser(id: string) {
-    return this.prisma.user.delete({ where: { id } });
+    return await this.prisma.user.delete({ where: { id } });
   }
 
   /* ARTIST */
 
   //FIXME: change type
   async createArtist(data: any) {
-    return this.prisma.artist.create({ data });
+    return await this.prisma.artist.create({ data });
   }
 
   async getAllArtists() {
-    return this.prisma.artist.findMany();
+    return await this.prisma.artist.findMany();
   }
 
   async getArtistById(id: string) {
-    return this.prisma.artist.findUnique({
+    return await this.prisma.artist.findUnique({
       where: {
         id,
       },
@@ -74,7 +74,7 @@ export class PrismaService {
   }
 
   async deleteArtist(id: string) {
-    return this.prisma.artist.delete({ where: { id } });
+    return await this.prisma.artist.delete({ where: { id } });
   }
 
   /* TRACK */
@@ -85,11 +85,11 @@ export class PrismaService {
   }
 
   async getAllTracks() {
-    return this.prisma.track.findMany();
+    return await this.prisma.track.findMany();
   }
 
   async getTrackById(id: string) {
-    return this.prisma.track.findUnique({
+    return await this.prisma.track.findUnique({
       where: {
         id,
       },
@@ -110,7 +110,7 @@ export class PrismaService {
   }
 
   async deleteTrack(id: string) {
-    return this.prisma.track.delete({ where: { id } });
+    return await this.prisma.track.delete({ where: { id } });
   }
 
   /* ALBUM */
@@ -121,11 +121,11 @@ export class PrismaService {
   }
 
   async getAllAlbums() {
-    return this.prisma.album.findMany();
+    return await this.prisma.album.findMany();
   }
 
   async getAlbumById(id: string) {
-    return this.prisma.album.findUnique({
+    return await this.prisma.album.findUnique({
       where: {
         id,
       },
@@ -145,7 +145,72 @@ export class PrismaService {
   }
 
   async deleteAlbum(id: string) {
-    return this.prisma.album.delete({ where: { id } });
+    return await this.prisma.album.delete({ where: { id } });
+  }
+
+  /* FAVORITES */
+
+  async getFavoriteArtists() {
+    return await this.prisma.favoriteArtist.findMany({
+      include: {
+        artist: true,
+      },
+    });
+  }
+
+  async getFavoriteAlbums() {
+    return await this.prisma.favoriteAlbum.findMany({
+      include: {
+        album: true,
+      },
+    });
+  }
+
+  async getFavoriteTracks() {
+    return await this.prisma.favoriteTrack.findMany({
+      include: {
+        track: true,
+      },
+    });
+  }
+
+  async addArtistToFavorite(id: string) {
+    return await this.prisma.favoriteArtist.create({
+      data: {
+        id,
+        artistId: id,
+      },
+    });
+  }
+
+  async deleteArtistFromFavorites(artistId: string) {
+    return await this.prisma.favoriteArtist.delete({ where: { id: artistId } });
+  }
+
+  async addAlbumToFavorite(id: string) {
+    return await this.prisma.favoriteAlbum.create({
+      data: {
+        id,
+        albumId: id,
+      },
+    });
+  }
+
+  async deleteAlbumFromFavorites(albumId: string) {
+    return await this.prisma.favoriteAlbum.delete({ where: { id: albumId } });
+  }
+
+  async addTrackToFavorite(id: string) {
+    return await this.prisma.favoriteTrack.create({
+      data: {
+        id,
+        trackId: id,
+      },
+    });
+  }
+
+  async deleteTrackFromFavorites(trackId: string) {
+    return await this.prisma.favoriteTrack.delete({ where: { id: trackId } });
   }
 
   async onClose() {
