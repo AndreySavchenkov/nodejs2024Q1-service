@@ -56,15 +56,17 @@ export class AlbumService {
       throw new NotFoundException(`Album with id ${id} not found`);
     }
 
-    const newAlbum = {
+    const newAlbumInfo = {
       name: updateAlbumDto.name,
       year: updateAlbumDto.year,
       artistId: updateAlbumDto.artistId,
     };
 
-    await this.prismaService.updateAlbum(id, newAlbum);
+    await this.prismaService.updateAlbum(id, newAlbumInfo);
 
-    return newAlbum;
+    const updatedAlbum = await this.prismaService.getAlbumById(id);
+
+    return updatedAlbum;
   }
 
   async remove(id: string) {

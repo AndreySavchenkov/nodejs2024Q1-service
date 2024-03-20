@@ -35,6 +35,7 @@ export class PrismaService {
       data: {
         password: dto.password,
         version: dto.version,
+        updatedAt: dto.updatedAt,
       },
     });
   }

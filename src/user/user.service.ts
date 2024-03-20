@@ -71,14 +71,14 @@ export class UserService {
       throw new NotFoundException(`User with id ${id} not found`);
     }
 
-    const newUserDto = {
+    const newUserInfo = {
       password: dto.newPassword,
       version: ++user.version,
       //FIXME: fix on date
       updatedAt: ++user.updatedAt,
     };
 
-    await this.prismaService.updatePassword(id, newUserDto);
+    await this.prismaService.updatePassword(id, newUserInfo);
 
     const newUser = await this.prismaService.getUserById(id);
 
