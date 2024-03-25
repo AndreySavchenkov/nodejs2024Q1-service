@@ -4,31 +4,40 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
+  Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { Response } from 'express';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { validate } from 'uuid';
 
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private prismaService: PrismaService,
+  ) {}
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    this.userService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+    const user = await this.userService.create(createUserDto);
+    res.status(HttpStatus.CREATED).json(user).send();
+    return user;
   }
 
   @Get()
-  async findAll(): Promise<Omit<User, 'password'>[]> {
+  async findAll() {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Omit<User, 'password'>> {
+  async findOne(@Param('id') id: string) {
     return this.userService.findById(id);
   }
 
@@ -36,13 +45,37 @@ export class UserController {
   async updatePassword(
     @Param('id') id: string,
     @Body() dto: UpdatePasswordDto,
+    @Res() res: Response,
   ) {
-    this.userService.updatePassword(id, dto);
+    if (!validate(id)) {
+      res.status(HttpStatus.BAD_REQUEST).send();
+      return;
+    }
+
+    const user = await this.prismaService.getUserById(id);
+
+    if (!user) {
+      res.status(HttpStatus.NOT_FOUND).send();
+      return;
+    }
+
+    if (user.password !== dto.oldPassword) {
+      res.status(HttpStatus.FORBIDDEN).send();
+      return;
+    }
+
+    const updatedUser = await this.userService.updatePassword(id, dto);
+
+    if (updatedUser) {
+      res.status(HttpStatus.OK).json(updatedUser).send();
+    } else {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send();
+    }
   }
 
   @Delete(':id')
   @HttpCode(204)
   async deleteUser(@Param('id') id: string) {
-    this.userService.delete(id);
+    return this.userService.delete(id);
   }
 }
