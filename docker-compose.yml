@@ -42,7 +42,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-    restart: unless-stopped
+    restart: always
     volumes:
       - PGDATA:/var/lib/postgresql/data
 volumes:
