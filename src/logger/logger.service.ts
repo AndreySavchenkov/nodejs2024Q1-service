@@ -29,23 +29,18 @@ export class LoggingService implements NestMiddleware, LoggerService {
     this.logger.error(message, { trace });
   }
 
-  // log(message: any, context?: string) {
-  //   this.logger.log(message);
-  // }
-
-  // error(message: any, trace?: string, context?: string) {
-  //   this.logger.error(message, { trace });
-  // }
-
   warn(message: any, context?: string) {
+    //TODO: implement method
     this.logger.warn(message);
   }
 
   debug?(message: any, context?: string) {
+    //TODO: implement method
     this.logger.debug(message);
   }
 
   verbose?(message: any, context?: string) {
+    //TODO: implement method
     this.logger.verbose(message);
   }
 

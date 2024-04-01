@@ -28,6 +28,14 @@ export class PrismaService {
     });
   }
 
+  async getUserByLogin(login: string) {
+    return await this.prisma.user.findFirst({
+      where: {
+        login,
+      },
+    });
+  }
+
   //FIXME: change type
   async updatePassword(id: string, dto: any) {
     return await this.prisma.user.update({

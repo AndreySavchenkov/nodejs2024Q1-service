@@ -60,6 +60,16 @@ export class UserService {
     return user;
   }
 
+  async findByLogin(login: string) {
+    const user = await this.prismaService.getUserById(login);
+
+    if (!user) {
+      throw new NotFoundException(`User with login: ${login} not found`);
+    }
+
+    return user;
+  }
+
   async updatePassword(id: string, dto: UpdatePasswordDto) {
     if (!validate(id)) {
       throw new BadRequestException('Id not UUID type');
