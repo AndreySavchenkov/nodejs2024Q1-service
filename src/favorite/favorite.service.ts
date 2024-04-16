@@ -1,35 +1,48 @@
 import { Injectable } from '@nestjs/common';
-import { dbService } from 'src/db/db.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class FavoriteService {
-  constructor(private readonly dbService: dbService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  getAll() {
-    return this.dbService.findAllFavorites();
+  async getAll() {
+    const favoriteArtists = await this.prismaService.getFavoriteArtists();
+    const favoriteTracks = await this.prismaService.getFavoriteTracks();
+    const favoriteAlbums = await this.prismaService.getFavoriteAlbums();
+
+    const favorite = {
+      tracks: favoriteTracks.map((track) => track.track),
+      albums: favoriteAlbums.map((album) => album.album),
+      artists: favoriteArtists.map((artist) => artist.artist),
+    };
+
+    return favorite;
   }
 
-  addArtist(id: string) {
-    this.dbService.addArtistInFavorite(id);
+  async addArtist(id: string) {
+    await this.prismaService.addArtistToFavorite(id);
+    return await this.prismaService.getArtistById(id);
   }
 
-  addAlbum(id: string) {
-    this.dbService.addAlbumInFavorites(id);
+  async addAlbum(id: string) {
+    await this.prismaService.addAlbumToFavorite(id);
+    return await this.prismaService.getAlbumById(id);
   }
 
-  addTrack(id: string) {
-    this.dbService.addTrackInFavorites(id);
+  async addTrack(id: string) {
+    await this.prismaService.addTrackToFavorite(id);
+    return await this.prismaService.getTrackById(id);
   }
 
-  deleteArtist(id: string) {
-    this.dbService.deleteArtistFromFavorites(id);
+  async deleteArtist(id: string) {
+    return await this.prismaService.deleteArtistFromFavorites(id);
   }
 
-  deleteAlbum(id: string) {
-    this.dbService.deleteAlbumFromFavorites(id);
+  async deleteAlbum(id: string) {
+    return await this.prismaService.deleteAlbumFromFavorites(id);
   }
 
-  deleteTrack(id: string) {
-    this.dbService.deleteTrackFromFavorites(id);
+  async deleteTrack(id: string) {
+    return await this.prismaService.deleteTrackFromFavorites(id);
   }
 }
